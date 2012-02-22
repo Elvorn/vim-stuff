@@ -1,5 +1,5 @@
-" Martin H. Bielecki
-" martinhb[at]ifi.uio...
+
+" martinhb
 
 "version 7.3 "vim version
 
