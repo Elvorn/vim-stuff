@@ -143,6 +143,8 @@ let Tlist_Use_Right_Window=1
 "autocmd Filetype    java        abbr psvm public static void main(String[] args) {
 "autocmd FileType    java        imap psvm psvm
 
+au BufNewFile,BufRead *.less   set filetype=less syntax=css
+
 "Make files
 autocmd FileType    make        set softtabstop=0 noexpandtab shiftwidth=8 "Makefiles need real tabs
 
