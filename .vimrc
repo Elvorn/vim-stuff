@@ -14,6 +14,7 @@
 " - Tasklist        -Shows TODO
 " - Snipmate        -Snippets
 " - Conqueterm      -Run terminal in vim
+" - TagBar
 
 " ** SETTINGS **
 " **************
