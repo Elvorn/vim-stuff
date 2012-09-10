@@ -17,7 +17,6 @@
 
 " ** SETTINGS **
 " **************
-
 "filetype plugin indent on       " use file specific plugins and indents
 
 set autoindent                  "autoindent new lines  
@@ -66,7 +65,8 @@ syntax on                       "set syntax higlighting on
 "Arrow key shortcuts
 nnoremap <silent> <Left>    :tabprevious<CR>
 nnoremap <silent> <Right>   :tabnext<CR>
-nnoremap <silent> <Up>      :TlistToggle<CR> 
+imap <up> <nop>
+nnoremap <silent> <Up>      :TagbarToggle<CR>
 nnoremap <silent> <down>    :NERDTreeToggle<CR>
 
 " disable arrow keys (for movement)
@@ -74,7 +74,7 @@ nnoremap <silent> <down>    :NERDTreeToggle<CR>
 "map <down> <nop>
 "map <left> <nop>
 "map <right> <nop>
-"imap <up> <nop>
+
 "imap <down> <nop>
 "imap <left> <nop>
 "imap <right> <nop>
@@ -129,6 +129,16 @@ nmap \J :g/\/\*\*/ foldc<CR>:nohls<CR>
 nnoremap <space> <C-f>
 nnoremap <S-space> <C-b>
 
+" 'quote' a word
+nnoremap qw :silent! normal mpea'<Esc>bi'<Esc>`pl
+" double "quote" a word
+nnoremap qd :silent! normal mpea"<Esc>bi"<Esc>`pl
+" remove quotes from a word
+nnoremap wq :silent! normal mpeld bhd `ph<CR>
+
+nnoremap qw :silent! normal "zyiw<Esc>:let @z="'".@z."'"<CR>cw<c-r>z<Esc>b
+nnoremap qd :silent! normal "zyiw<Esc>:let @z="\"".@z."\""<CR>cw<c-r>z<Esc>b
+
 " ** FILETYPE SPECIFIC **
 " ***********************
 
@@ -143,7 +153,7 @@ let Tlist_Use_Right_Window=1
 "autocmd Filetype    java        abbr psvm public static void main(String[] args) {
 "autocmd FileType    java        imap psvm psvm
 
-au BufNewFile,BufRead *.less   set filetype=less syntax=css
+au BufNewFile,BufRead *.less   set filetype=less syntax=less
 
 "Make files
 autocmd FileType    make        set softtabstop=0 noexpandtab shiftwidth=8 "Makefiles need real tabs
@@ -235,4 +245,38 @@ map <F3> :Matrix<CR>
 map <F4> :ConqueTermVSplit bash<CR>
 let g:ConqueTerm_TERM = 'xterm-256color'
 "let g:ConqueTerm_Color = 2
+
+let g:tagbar_type_scala = {
+     \ 'ctagstype' : 'scala',
+     \ 'kinds'     : [
+        \ 'p:packages:1' ,
+        \ 'V:values' ,
+        \ 'v:variables' ,
+        \ 'T:types' ,
+        \ 't:traits' ,
+        \ 'o:objects' ,
+        \ 'a:aclasses' ,
+        \ 'c:classes' ,
+        \ 'r:cclasses' ,
+        \ 'm:methods'
+     \ ],
+     \ 'sro'     : '.',
+     \ 'kind2scope':{
+        \ 'T' : 'type',
+        \ 't' : 'trait',
+        \ 'o' : 'object',
+        \ 'a' : 'abstract class',
+        \ 'c' : 'class',
+        \ 'r' : 'case class'
+     \ },
+     \ 'scope2kind':{
+        \ 'type'           : 'T',
+        \ 'trait'          : 't',
+        \ 'object'         : 'o',
+        \ 'abstract class' : 'a',
+        \ 'class'          : 'c',
+        \ 'case class'     : 'r'
+     \ },
+     \ 'deffile' : expand('<sfile>:h') . '/.vim/ctags-scala'
+ \ }
 
