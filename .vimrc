@@ -14,11 +14,11 @@
 " - Tasklist        -Shows TODO
 " - Snipmate        -Snippets
 " - Conqueterm      -Run terminal in vim
-" - TagBar
+" - TagBar          -Tag browser (replaces taglist)
 
 " ** SETTINGS **
 " **************
-"filetype plugin indent on       " use file specific plugins and indents
+filetype plugin indent on       " use file specific plugins and indents
 
 set autoindent                  "autoindent new lines  
 set autoread                    "automatically re-read when file is changed
@@ -39,7 +39,7 @@ set mouse=a                     "enable mouse
 set matchtime=2                 "show matchin braces in tenths of a second
 set wrap                        "wrap long lines
 set nocompatible                "VIM is VI Improved for a reason
-set noerrorbells                "no sounds 
+set noerrorbells                "no sounds
 set novisualbell                "no blink on error
 set nocopyindent                "follow previous indent level
 set number                      "turn on linenumbering
@@ -50,18 +50,15 @@ set shiftwidth=4                "number of spaces per indent level
 set softtabstop=4               "insert 4 spaces when tab is pressed
 set statusline=%#Time#%{strftime(\"\%a\ \%d\ \%b\ \%H:\%M\ \ \",localtime())}\ %#Filepath#[\%F]%#Filetype#\ %y%#Flags#\ %M\ \ %r\ %h\ %w\ %=%L\ lines\ \ \ %#Percentage#[%p%%]%#Positions#\ %6l,%4c%V\ \ \ 
 set tabstop=8                   "an actual tab is 8 spaces.
-set textwidth=119               "generate newline at col 80
+set textwidth=89               "generate newline at col 90
 set hlsearch                    "search highlighting
 set vb
 set wildignore=.dll,.o,.obj,    " do not list these file extensions
               \.bak,.exe,.pyc,.jpg,.gif,.png,.wmv,.pdf,.avi,.mpg,
-              \.divx,.so,.a
+              \.divx,.so,.a,.class
 set wildmenu
 syntax on                       "set syntax higlighting on
 
-"set statusline+=%#warningmsg#
-"set statusline+=%{SyntasticStatuslineFlag()}
-"set statusline+=%*
 
 "Arrow key shortcuts
 nnoremap <silent> <Left>    :tabprevious<CR>
@@ -70,17 +67,17 @@ imap <up> <nop>
 nnoremap <silent> <Up>      :TagbarToggle<CR>
 nnoremap <silent> <down>    :NERDTreeToggle<CR>
 
-" disable arrow keys (for movement)
-"map <up> <nop>
-"map <down> <nop>
-"map <left> <nop>
-"map <right> <nop>
-
-"imap <down> <nop>
-"imap <left> <nop>
-"imap <right> <nop>
-
-
+"" disable arrow keys (for movement)
+""map <up> <nop>
+""map <down> <nop>
+""map <left> <nop>
+""map <right> <nop>
+"
+""imap <down> <nop>
+""imap <left> <nop>
+""imap <right> <nop>
+"
+"
 " Use Command-TAB (on mac OS X) to complete words
 " Usual completion is on <C-n> and <C-p> but more trouble to press all the time
 function! Tab_Or_Complete()
@@ -129,16 +126,14 @@ nmap \J :g/\/\*\*/ foldc<CR>:nohls<CR>
 " Make space in normal mode go down a screenfull
 nnoremap <space> <C-f>
 nnoremap <S-space> <C-b>
+inoremap <silent> <C-space> <C-x><C-o>
 
 " 'quote' a word
 nnoremap qw :silent! normal mpea'<Esc>bi'<Esc>`pl
 " double "quote" a word
 nnoremap qd :silent! normal mpea"<Esc>bi"<Esc>`pl
-" remove quotes from a word
-nnoremap wq :silent! normal mpeld bhd `ph<CR>
-
-nnoremap qw :silent! normal "zyiw<Esc>:let @z="'".@z."'"<CR>cw<c-r>z<Esc>b
-nnoremap qd :silent! normal "zyiw<Esc>:let @z="\"".@z."\""<CR>cw<c-r>z<Esc>b
+" remove quotes from a word (LAGS WTF)
+"nnoremap wq :silent! normal mpeld bhd `ph<CR>
 
 " ** FILETYPE SPECIFIC **
 " ***********************
@@ -149,11 +144,9 @@ let Tlist_Ctags_Cmd = '/usr/local/bin/ctags'
 let Tlist_Use_Right_Window=1
 
 "Java specific
-"autocmd FileType    java        abbr sopl System.out.println("
-"autocmd FileType    java        imap sopl sopl<ESC>a
-"autocmd Filetype    java        abbr psvm public static void main(String[] args) {
-"autocmd FileType    java        imap psvm psvm
+au Filetype java setlocal omnifunc=javacomplete#Complete completefunc=javacomplete#CompleteParamsInfo
 
+"Less specific
 au BufNewFile,BufRead *.less   set filetype=less syntax=less
 
 "Make files
