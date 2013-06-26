@@ -5,27 +5,48 @@
 
 " ** PLUGINS **
 " *************
-
 " - NERDtree        -File browser
 " - taglist         -Tag browser
 " - codepad         -paste to codepad.org (:CPPaste to Paste. :CPRun to paste and run)
-" - MATRIX MODE     -Speaks for itself
+" - MATRIX MODE     -Speaks for itself (very bugged)
 " - SearchComplete  -TAB completion when searching for text
 " - Tasklist        -Shows TODO
 " - Snipmate        -Snippets
 " - Conqueterm      -Run terminal in vim
 " - TagBar          -Tag browser (replaces taglist)
+" - Closetag        -Easy closing of HTML/XML tags
+" - Surround        -Manage surroundings
+" - Matchit         -Easy tag matching
+" - And many more...
 
 " ** SETTINGS **
 " **************
 filetype plugin indent on       " use file specific plugins and indents
+let g:swank_log=1
+" Leader keybinds
+let mapleader="," "Set to comma instead of the default \
+noremap <Leader>f :FufFileWithCurrentBufferDir<CR>
+noremap <Leader>F :FufFileWithFullCwd<CR>
+noremap <Leader>r :RainbowParenthesesToggleAll<CR>
+
+
+noremap <Leader>y I<Esc>v$hy
+noremap <Leader>d I<Esc>v$hd
+
+" Rebind split navigation
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
+
 
 set autoindent                  "autoindent new lines  
 set autoread                    "automatically re-read when file is changed
 set backspace=indent,eol,start  "smart backspacing
 "set backupdir=~/.vim/backup     "directory for backups
 set cindent                     "auto-indent things in braces, loops, conditions etc
-set colorcolumn=91
+"set colorcolumn=91
+set cursorline
 "set directory=~/.vim/tmp        "directory for swap-files
 set expandtab                   "convert tabs to spaces. Use CTRL-V<TAB> to enter a real tab
 set history=50                  "remember 50 commands
@@ -59,6 +80,8 @@ set wildignore=.dll,.o,.obj,    " do not list these file extensions
 set wildmenu
 syntax on                       "set syntax higlighting on
 
+" Color my vim pliz
+let &t_Co=256
 
 "Arrow key shortcuts
 nnoremap <silent> <Left>    :tabprevious<CR>
@@ -66,6 +89,7 @@ nnoremap <silent> <Right>   :tabnext<CR>
 imap <up> <nop>
 nnoremap <silent> <Up>      :TagbarToggle<CR>
 nnoremap <silent> <down>    :NERDTreeToggle<CR>
+nnoremap <silent> <S-down>  :FufFile<CR>
 
 "" disable arrow keys (for movement)
 ""map <up> <nop>
@@ -119,6 +143,9 @@ nmap \H :set hls<Enter>
 " inserts a closing bracket after an opening bracket and puts the cursor in the middle of them
 inoremap {<CR> {<CR>}<Esc>O
 
+" Matching characters
+""inoremap " ""<Esc>hi
+
 " Fold/unfold JavaDoc
 nmap \j :g/\/\*\*/ foldo<CR>:nohls<CR>
 nmap \J :g/\/\*\*/ foldc<CR>:nohls<CR>
@@ -163,16 +190,19 @@ autocmd FileType    maude       map - :s/^/\***<CR>:nohlsearch<CR>
 "sparql syntax
 autocmd FileType    rq       set syntax=sparql
 
+"LaTeX
+au BufNewFile,BufRead *.tex     set filetype=tex
+
 "RDF Notation 3 Syntax
 augroup filetypedetect
 au BufNewFile,BufRead *.n3  setfiletype n3
 au BufNewFile,BufRead *.ttl  setfiletype n3
 augroup END
 
-
 " Comment lines with -. Uncomment with Shift -
 autocmd FileType    python,ruby,asm,ttl     map - :s/^/#/<CR>:nohlsearch<CR>
 autocmd FileType    c,cpp,java,php,scala  map - :s/^/\/\//<CR>:nohlsearch<CR>
+autocmd FileType    tex,emerald        map - :s/^/%/<CR>:nohlsearch<CR>
 map _ :s/^\/\/\\|^--\\^> \\|^[*#"%!;]//<CR>:nohls<CR>
 
 
@@ -181,18 +211,23 @@ autocmd FileType c,cpp,java map <F8>  :s:^\s*:&\/\*\* :<CR>:s:$: \*\/:<CR>:nohls
 " F9 - uncomment FOLLOWING pair/block of C-style comments (and JavaDoc)
 autocmd FileType c,cpp,java map <F9> :/\/\*/,/\*\//s:\/\*\*\= \=\\|\*\/\\|^\s*\*::g<CR>:nohls<CR>
 
-"HTML specific
+"HTML/XML specific
 " F8  - comment this line with HTML comments
 autocmd FileType html map <F8> :s:^\s*:&<!-- :<CR>:s:$: -->:<CR>:nohls<CR>
 " F9 - uncomment FOLLOWING pair/block of HTML comments
 autocmd FileType html map <F9> :/<!--/,/-->/s:<!-- \=\\| \=-->::g<CR>:nohls<CR>
+autocmd FileType html,htmldjango,jinjahtml,eruby,mako let b:closetag_html_style=1
+autocmd FileType html,xhtml,xml,htmldjango,jinjahtml,eruby,mako source ~/.vim/plugin/closetag.vim
 
  " For quick Java compiling in VIM when too lazy to switch to terminal
 autocmd FileType    java            map <F6> :w<CR>:!echo -- Compiling %; javac %<CR>
 autocmd FileType    java            map <F7> <S-F7><CR>
 autocmd FileType    java            map <S-F7> :!echo -- Running %<; java %<
 
-" For simple compiling autocmd FileType    c               map <F6> :w<CR>:!echo -- Compiling %; gcc -o %< %<CR>
+autocmd FileType    tex             map <F6> :w<CR>:!echo -- Compiling %; pdflatex %<CR>
+" For simple compiling
+
+autocmd FileType    c               map <F6> :w<CR>:!echo -- Compiling %; gcc -o %< %<CR>
 autocmd FileType    cpp             map <F6> :w<CR>:!echo -- Compiling %; g++ -o %< %<CR>
 autocmd FileType    c,cpp           map <F7> <S-F7><CR>
 autocmd FileType    c,cpp           map <S-F7> :!echo -- Running %<; ./%<
@@ -212,26 +247,40 @@ autocmd FileType maude              map <F6> :w <CR>:!echo -- Running maude %<; 
 au BufRead,BufNewFile *.scala set filetype=scala
 au! Syntax scala source ~/.vim/syntax/scala.vim
 
+"Emerald syntax
+au BufRead,BufNewFile *.m set filetype=emerald
+
+" Racket
+au BufRead,BufNewFile *.rkt,*.rktl  set filetype=racket
+"au! Syntax racket source ~/.vim/syntax/racket.vim
+
+" Let Slimv load on common lisp only (dont get it to work with anything else than common lisp)
+let g:slimv_disable_scheme = 1
+let g:slimv_disable_clojure = 1
+
 " ** GUIOPTIONS **
 " ****************
-colorscheme molokai
+colorscheme lucius
 
 if has ("gui_running")
-	set guioptions-=T 		"removes toolbar in gvim
-	colorscheme tango2		"midnight colorscheme
-	set autochdir                   "cd to dir of current file
-	"syntax off			"let the colorscheme handle the syntax
-        set guioptions-=R "scrollbars
+        set guioptions-=T               "removes toolbar in gvim
+        colorscheme lucius              "lucius colorscheme
+        set autochdir                   "cd to dir of current file
+        "syntax off                     "let the colorscheme handle the syntax
+        set listchars=tab:>·,trail:·    "show tabs and trailing whitespace
+        set guioptions-=R               "scrollbars
         set guioptions-=r
         set guioptions-=L
         set guioptions-=B
-	set guioptions+=c
-	set guioptions+=a
+        set guioptions+=c
+        set guioptions+=a
         set guifont=Monaco:h11
         set fuoptions=maxhorz,maxvert
-	
 endif
 
+" Quickly edit/reload the vimrc file
+nmap <silent> <Leader>ev :tabnew $MYVIMRC<CR>
+nmap <silent> <Leader>sv :so $MYVIMRC<CR>
 
 " type :set go+=T to display toolbar
 map <F3> :Matrix<CR>
@@ -240,6 +289,7 @@ map <F4> :ConqueTermVSplit bash<CR>
 let g:ConqueTerm_TERM = 'xterm-256color'
 "let g:ConqueTerm_Color = 2
 
+"Scala tagbar
 let g:tagbar_type_scala = {
      \ 'ctagstype' : 'scala',
      \ 'kinds'     : [
@@ -274,3 +324,29 @@ let g:tagbar_type_scala = {
      \ 'deffile' : expand('<sfile>:h') . '/.vim/ctags-scala'
  \ }
 
+" Rainbow Parentheses
+let g:rbpt_colorpairs = [
+    \ ['brown',       'RoyalBlue3'],
+    \ ['Darkblue',    'SeaGreen3'],
+    \ ['darkgray',    'DarkOrchid3'],
+    \ ['darkgreen',   'firebrick3'],
+    \ ['darkcyan',    'RoyalBlue3'],
+    \ ['darkred',     'SeaGreen3'],
+    \ ['darkmagenta', 'DarkOrchid3'],
+    \ ['brown',       'firebrick3'],
+    \ ['gray',        'RoyalBlue3'],
+    \ ['black',       'SeaGreen3'],
+    \ ['darkmagenta', 'DarkOrchid3'],
+    \ ['Darkblue',    'firebrick3'],
+    \ ['darkgreen',   'RoyalBlue3'],
+    \ ['darkcyan',    'SeaGreen3'],
+    \ ['darkred',     'DarkOrchid3'],
+    \ ['red',         'firebrick3'],
+    \ ]
+
+let g:rbpt_max = 16
+let g:rbpt_loadcmd_toggle = 0
+au VimEnter * RainbowParenthesesToggle
+au Syntax * RainbowParenthesesLoadRound
+au Syntax * RainbowParenthesesLoadSquare
+au Syntax * RainbowParenthesesLoadBraces
